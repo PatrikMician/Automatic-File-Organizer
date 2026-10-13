@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Automatický organizátor souborů</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>
+      <span>Organizátor souborů</span>
+    </div>
+    <div class="breadcrumbs" id="breadcrumbs"></div>
+    <input type="search" id="search" placeholder="Hledat v této složce…" aria-label="Hledat">
+  </header>
+
+  <div class="toolbar">
+    <button id="btn-up" title="Nadřazená složka">⬆ Nahoru</button>
+    <button id="btn-upload">⬆ Nahrát</button>
+    <button id="btn-mkdir">＋ Nová složka</button>
+    <button id="btn-rename">✎ Přejmenovat</button>
+    <button id="btn-delete" class="danger">🗑 Smazat</button>
+    <span class="spacer"></span>
+    <button id="btn-organize" class="primary">✨ Automaticky uspořádat</button>
+    <button id="btn-undo">↶ Zpět</button>
+    <input type="file" id="file-input" multiple hidden>
+  </div>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h3>Složky</h3>
+      <div id="tree"></div>
+      <h3>Statistika</h3>
+      <div id="stats"></div>
+    </aside>
+
+    <section class="content" id="dropzone">
+      <table class="files">
+        <thead>
+          <tr>
+            <th data-sort="name">Název</th>
+            <th data-sort="category">Typ</th>
+            <th data-sort="size" class="num">Velikost</th>
+            <th data-sort="modified">Změněno</th>
+          </tr>
+        </thead>
+        <tbody id="file-list"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>Složka je prázdná. Přetáhni sem soubory nebo je nahraj tlačítkem.</div>
+      <div class="drop-hint" id="drop-hint">Pusť soubory pro nahrání</div>
+    </section>
+  </main>
+
+  <footer class="statusbar"><span id="status">Připraveno</span></footer>
+
+  <!-- Dialog: organizér -->
+  <dialog id="dlg-organize">
+    <form method="dialog" class="dlg">
+      <h2>Automatické uspořádání</h2>
+      <p class="muted">Soubory v aktuální složce se přesunou do podsložek podle zvoleného pravidla. Nejdřív uvidíš náhled.</p>
+
+      <label class="opt"><input type="radio" name="mode" value="type" checked>
+        <div><b>Podle typu</b><small>Obrázky, Dokumenty, Hudba, Videa…</small></div></label>
+      <label class="opt"><input type="radio" name="mode" value="extension">
+        <div><b>Podle přípony</b><small>pdf, jpg, docx…</small></div></label>
+      <label class="opt"><input type="radio" name="mode" value="date">
+        <div><b>Podle data změny</b><small>rok / měsíc</small></div></label>
+      <label class="opt"><input type="radio" name="mode" value="size">
+        <div><b>Podle velikosti</b><small>Malé / Velké (limit <input type="number" id="size-limit" value="10" min="0.1" step="0.1"> MB)</small></div></label>
+
+      <label class="check"><input type="checkbox" id="opt-recursive"> Zahrnout i podsložky</label>
+      <label class="check"><input type="checkbox" id="opt-cleanup" checked> Smazat prázdné složky po přesunu</label>
+
+      <div id="preview-box" hidden>
+        <h3>Náhled změn</h3>
+        <div id="preview-summary"></div>
+        <div class="preview-list" id="preview-list"></div>
+      </div>
+
+      <menu>
+        <button value="cancel">Zavřít</button>
+        <button type="button" id="btn-preview">Zobrazit náhled</button>
+        <button type="button" id="btn-run" class="primary" disabled>Provést</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <!-- Dialog: náhled souboru -->
+  <dialog id="dlg-view">
+    <form method="dialog" class="dlg">
+      <h2 id="view-title"></h2>
+      <div id="view-body"></div>
+      <menu><button value="close">Zavřít</button></menu>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
